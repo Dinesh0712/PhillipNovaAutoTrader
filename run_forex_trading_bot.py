@@ -1,36 +1,46 @@
 import subprocess
 import time
+import sys
 import os
 
-# Paths to scripts
-SIGNAL_SCRIPT = "signal_generator.py"
-EXECUTOR_SCRIPT = "mt5_trade_executor_multi.py"
+def run_process(command):
+    # Start a subprocess, capture output if needed
+    return subprocess.Popen(command, shell=True)
 
-VENV_PYTHON = os.path.join(os.getcwd(), ".venv", "Scripts", "python.exe")
+def main():
+    # Adjust these paths if needed
+    signal_gen_script = os.path.abspath("signal_generator.py")
+    trade_exec_script = os.path.abspath("mt5_trade_executor_multi.py")
 
-def launch_script(script_name):
-    return subprocess.Popen([VENV_PYTHON, script_name])
-
-if __name__ == "__main__":
-    print("🚀 Starting Signal Generator and Trade Executor...")
-    
-    # Start both scripts
-    signal_proc = launch_script(SIGNAL_SCRIPT)
-    time.sleep(5)  # small delay to ensure signal starts first
-    executor_proc = launch_script(EXECUTOR_SCRIPT)
-
-    print("🟢 Both bots running. Press Ctrl+C to stop.")
+    # You might want to run these in separate processes
+    signal_process = run_process(f'"{sys.executable}" "{signal_gen_script}"')
+    print("Signal generator started.")
+    time.sleep(30)
+    trade_process = run_process(f'"{sys.executable}" "{trade_exec_script}"')
+    print("Trade executor started")
 
     try:
         while True:
-            time.sleep(10)
-            # optionally check if either process has crashed
-            if signal_proc.poll() is not None:
-                print("⚠️ Signal Generator stopped.")
-            if executor_proc.poll() is not None:
-                print("⚠️ Trade Executor stopped.")
+            # Optionally monitor subprocesses and restart if they die
+            if signal_process.poll() is not None:
+                print("Signal generator stopped unexpectedly. Restarting...")
+                signal_process = run_process(f"{sys.executable} {signal_gen_script}")
+
+            if trade_process.poll() is not None:
+                print("Trade executor stopped unexpectedly. Restarting...")
+                trade_process = run_process(f"{sys.executable} {trade_exec_script}")
+
+            time.sleep(60)  # Check every minute
+
     except KeyboardInterrupt:
-        print("🛑 Stopping both bots...")
-        signal_proc.terminate()
-        executor_proc.terminate()
-        print("✅ Shutdown complete.")
+        print("Stopping bot...")
+
+        # Terminate subprocesses cleanly
+        signal_process.terminate()
+        trade_process.terminate()
+
+        signal_process.wait()
+        trade_process.wait()
+
+if __name__ == "__main__":
+    main()
