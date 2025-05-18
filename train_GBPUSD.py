@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 
 SYMBOL = "GBPUSD"
 
-# Load and combine CSVs - make sure Local time column is parsed correctly
 df1 = pd.read_csv("GBPUSD1.csv", parse_dates=['Local time'])
 df2 = pd.read_csv("GBPUSD2.csv", parse_dates=['Local time'])
 df3 = pd.read_csv("GBPUSD3.csv", parse_dates=['Local time'])
@@ -54,7 +53,7 @@ def detect_wedge_pattern(df, window=20, tolerance=0.05, min_slope=1e-4, min_rati
     return df
 
 def engineer_features(df):
-    df = df.copy()  # avoid SettingWithCopyWarning
+    df = df.copy() 
     close = df["Close"]
     high = df["High"]
     low = df["Low"]
@@ -152,7 +151,6 @@ def train_model(df, symbol):
     print(f"Model class: {model.__class__}")
     print(f"Model module: {model.__module__}")
 
-    # Try fit with early stopping and catch errors
     # try:
     model.fit(
         X_train, y_train,

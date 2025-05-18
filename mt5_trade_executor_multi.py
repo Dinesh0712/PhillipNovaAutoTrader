@@ -25,7 +25,6 @@ def get_current_position(symbol):
     positions = mt5.positions_get(symbol=symbol)
     if not positions:
         return None
-    # Assuming single position per symbol
     return positions[0]
 
 def close_position(position):
@@ -102,22 +101,21 @@ def main():
 
             position = get_current_position(symbol)
 
-            # Get price before closing
+            # Gets price before closing position
             price_before_close = None
             if position is not None:
                 price_info = mt5.symbol_info_tick(symbol)
                 if price_info:
-                    price_before_close = price_info.last  # or price_info.ask/bid
+                    price_before_close = price_info.last 
 
                 print(f"Closing existing position for {symbol} at price {price_before_close}")
                 if not close_position(position):
                     print(f"Failed to close position for {symbol}, skipping opening new position")
-                    continue  # skip to next symbol if can't close
+                    continue
 
-            # Add a short delay before opening new position (optional)
             time.sleep(1)
 
-            # Get price before opening new position
+            # Gets price before opening new position
             price_info = mt5.symbol_info_tick(symbol)
             price_before_open = price_info.last if price_info else None
             print(f"Opening {signal} position for {symbol} at price {price_before_open}")
@@ -128,8 +126,8 @@ def main():
                 log_trade_prices(symbol, price_before_close, price_before_open, price_after_open)
 
 
-            # Log price after opening (can check position again if needed)
-            time.sleep(2)  # optional small delay
+
+            time.sleep(2)
             price_info_after = mt5.symbol_info_tick(symbol)
             price_after_open = price_info_after.last if price_info_after else None
             print(f"Price after opening position for {symbol}: {price_after_open}")

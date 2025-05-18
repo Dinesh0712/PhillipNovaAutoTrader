@@ -13,7 +13,6 @@ TIMEFRAME = mt5.TIMEFRAME_M15
 NUM_BARS = 5000
 CSV_OUTPUT_PATH = "../signal.csv"
 
-# Cache models after loading once
 loaded_models = {}
 
 def initialize_mt5():

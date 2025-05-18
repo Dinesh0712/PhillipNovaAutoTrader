@@ -4,15 +4,12 @@ import sys
 import os
 
 def run_process(command):
-    # Start a subprocess, capture output if needed
     return subprocess.Popen(command, shell=True)
 
 def main():
-    # Adjust these paths if needed
     signal_gen_script = os.path.abspath("signal_generator.py")
     trade_exec_script = os.path.abspath("mt5_trade_executor_multi.py")
 
-    # You might want to run these in separate processes
     signal_process = run_process(f'"{sys.executable}" "{signal_gen_script}"')
     print("Signal generator started.")
     time.sleep(30)
@@ -21,7 +18,6 @@ def main():
 
     try:
         while True:
-            # Optionally monitor subprocesses and restart if they die
             if signal_process.poll() is not None:
                 print("Signal generator stopped unexpectedly. Restarting...")
                 signal_process = run_process(f"{sys.executable} {signal_gen_script}")
@@ -35,7 +31,6 @@ def main():
     except KeyboardInterrupt:
         print("Stopping bot...")
 
-        # Terminate subprocesses cleanly
         signal_process.terminate()
         trade_process.terminate()
 
